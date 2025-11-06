@@ -19,7 +19,7 @@ https://www.liquidweb.com/
 - Built-in search
 - Quick connect on [ENTER]
 - Persisting list of hosts with refresh by [~]
-- Quick exit on [ESC]
+- Quick exit on [ESC] or 'exit' or 'quit' words
 - Hosts limited to osFamily=linux
 
 # How to create  ~/.lwc/config file

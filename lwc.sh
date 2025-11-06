@@ -80,7 +80,7 @@ while true; do
   # --- ESC pressed ---
   [[ "$key" == "esc" ]] && { echo "👋 Exit."; break; }
 
-  # --- R pressed (refresh cache) ---
+  # --- ~ pressed (refresh cache) ---
   if [[ "$key" == "~" ]]; then
     refresh_cache
     # Reload current file into tmpfile
