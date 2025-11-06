@@ -1,10 +1,6 @@
 #!/bin/bash
 
-source .creds
-SSH_KEY_PATH="$HOME/.ssh/dropco"
-SSH_USER="root"
-SSH_PARAMS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-
+source   ~/.lwc/config
 
 set -euo pipefail
 
@@ -15,12 +11,11 @@ function connect {
 function call {
     USER=$1
     PASS=$2
-    #echo "requesting API with user $USER and pass $PASS"
     curl -sS -u "$USER:$PASS" \
           -H 'Content-Type: application/json' \
           -X POST https://api.liquidweb.com/v3/asset/list  \
           -d '{"params":{"page_size":1000, "alsowith":["osFamily","networkSummary"]}}' | \
-        jq '.items[] |"\(.uniq_id)\t\(.custom_name)\t\(.domain)\t\(.osFamily)\t\(.ip)"' -r  | \
+        jq '.items[] | select (.osFamily == "linux") |"\(.uniq_id)\t\(.custom_name)\t\(.domain)\t\(.ip)"' -r  | \
         column -t
     
 }
@@ -69,16 +64,16 @@ cp "$LW_ONE_FILE" "$TMPFILE"
 
 while true; do
 #  echo
-  echo "🔹 [$current]  ↑↓ move • TAB switch • ENTER connect • R refresh • ESC quit"
+  echo "🔹 [$current]  ↑↓ move • TAB switch • ENTER connect • ~ refresh • ESC quit"
 #  echo
 
-  # inline (not full screen)
+  # inline
   { read -r key; read -r sel; } <<<"$(fzf \
     --height=20 \
     --border=rounded \
     --inline-info \
     --prompt="[$current] > " \
-    --expect=enter,tab,esc,r \
+    --expect=enter,tab,esc,~ \
     --no-preview \
     <"$TMPFILE")"
 
@@ -86,7 +81,7 @@ while true; do
   [[ "$key" == "esc" ]] && { echo "👋 Exit."; break; }
 
   # --- R pressed (refresh cache) ---
-  if [[ "$key" == "r" ]]; then
+  if [[ "$key" == "~" ]]; then
     refresh_cache
     # Reload current file into tmpfile
     if [[ "$current" == "lwone" ]]; then
@@ -131,7 +126,6 @@ while true; do
 done
 
 rm -f "$TMPFILE"
-# Note: LW_ONE_FILE and LW_TWO_FILE are persistent cache files in /tmp - not deleted
 }
 
 main
